@@ -2,6 +2,7 @@
 Smith-Waterman algorythm implementation
 
 was inspired by https://github.com/ngopal/SimpleSmithWatermanCPP/blob/master/SmithWaterman.cpp
+this one didn't work and I had to rewrite it, because it had problems (big problems) with indexes and array allocation
 perspectives: divide gap penalty to gap opening penalty and gap extension penalty
 
 input: program will ask you for two sequences
