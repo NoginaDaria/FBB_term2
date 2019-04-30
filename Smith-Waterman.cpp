@@ -8,7 +8,7 @@ perspectives: divide gap penalty to gap opening penalty and gap extension penalt
 input: program will ask you for two sequences
 output: matrix, max value of the matrix and alignments
 
-hope it works nice
+hope it works nicely
 */
 
 
