@@ -60,31 +60,6 @@ double gap_extension_penalty = 0.5;
 double gap_new_penalty = gap_opening_penalty + gap_extension_penalty;
 double match_score = 1;
 
-//introducing some useful function which set us value for diagonal movement
-double ifequal(char a, char b)
-{
-	double result;
-	a == b ? result = match_score : result = penalty;
-	return result;
-};
-
-//take index of max element in array
-int max_index(double array[], int length)
-{
-	double max = 0;
-	int ind = 0;
-
-	for (int i = 0; i < length; i++)
-	{
-		if (array[i] > max)
-		{
-			max = array[i];
-			ind = i;
-		}
-	}
-	return ind;
-};
-
 double max(double x, double y)
 {
 	return x > y ? x : y;
