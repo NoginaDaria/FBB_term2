@@ -135,15 +135,6 @@ int main()
 	for (int i = 0; i < (seq1_len + 1); i++)
 		matrix[i] = (double *)malloc((seq2_len + 1) * sizeof(double));
 
-	//set zero matrix
-	for (int i = 0; i < seq1_len; i++)
-	{
-		for (int j = 0; j < seq2_len; j++)
-		{
-			matrix[i][j] = 0;
-		}
-	}
-
 	//set traceback and some other cool things
 	double traceback[4];
 
