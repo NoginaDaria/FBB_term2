@@ -12,8 +12,6 @@ hope it works nicely
 */
 
 
-
-#include "pch.h"
 #include <iostream>
 #include <string>
 #include <algorithm>
