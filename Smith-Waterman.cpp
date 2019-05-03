@@ -6,8 +6,8 @@ this one didn't work and I had to rewrite it, because it had problems (big probl
 perspectives: divide gap penalty to gap opening penalty and gap extension penalty (upd 4th may: done)
 + update: user can set parameters
 
-input: program will ask you for two sequences
-output: matrix, max value of the matrix and alignments
+input: program will ask you for two sequences and for parameters if you agree
+output: score and alignments
 
 hope it works nicely
 */
