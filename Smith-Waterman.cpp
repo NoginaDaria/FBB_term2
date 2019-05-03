@@ -3,7 +3,7 @@ Smith-Waterman algorythm implementation
 
 was inspired by https://github.com/ngopal/SimpleSmithWatermanCPP/blob/master/SmithWaterman.cpp
 this one didn't work and I had to rewrite it, because it had problems (big problems) with indexes and memory allocation
-perspectives: divide gap penalty to gap opening penalty and gap extension penalty
+perspectives: divide gap penalty to gap opening penalty and gap extension penalty (upd 4th may: done)
 
 input: program will ask you for two sequences
 output: matrix, max value of the matrix and alignments
@@ -13,10 +13,10 @@ hope it works nicely
 
 
 
+#include "pch.h"
 #include <iostream>
 #include <string>
 #include <algorithm>
-//#include <boost/algorithm/string.hpp>  needs to be installed to convert string to upper case in future, all these actions are commented to work on all devices
 
 using namespace std;
 
@@ -24,11 +24,65 @@ using namespace std;
 double ifequal(char a, char b);
 int max_index(double array[], int length = 4);
 
-double penalty = -4; //introducing auto penalty
-double match_score = 1; //match_score
+const signed char BLOSUM[][25] = { // the blosum 62 scoring matrix
+   {4, 0, 0, -2, -1, -2, 0, -2, -1, 0, -1, -1, // A
+	-1, -2, 0, -1, -1, -1, 1, 0, 0, 0, -3, 0, -2},
+   {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+   {0, 0, 9, -3, -4, -2, -3, -3, -1, 0, -3, -1, // C
+	-1, -3, 0, -3, -3, -3, -1, -1, 0, -1, -2, 0, -2},
+   {-2, 0, -3, 6, 2, -3, -1, -1, -3, 0, -1, -4, // D
+	-3, 1, 0, -1, 0, -2, 0, -1, 0, -3, -4, 0, -3},
+   {-1, 0, -4, 2, 5, -3, -2, 0, -3, 0, 1, -3, // E
+	-2, 0, 0, -1, 2, 0, 0, -1, 0, -2, -3, 0, -2},
+   {-2, 0, -2, -3, -3, 6, -3, -1, 0, 0, -3, 0, // F
+	0, -3, 0, -4, -3, -3, -2, -2, 0, -1, 1, 0, 3},
+   {0, 0, -3, -1, -2, -3, 6, -2, -4, 0, -2, -4, // G
+	-3, 0, 0, -2, -2, -2, 0, -2, 0, -3, -2, 0, -3},
+   {-2, 0, -3, -1, 0, -1, -2, 8, -3, 0, -1, -3, // H
+	-2, 1, 0, -2, 0, 0, -1, -2, 0, -3, -2, 0, 2},
+   {-1, 0, -1, -3, -3, 0, -4, -3, 4, 0, -3, 2, // I
+	1, -3, 0, -3, -3, -3, -2, -1, 0, 3, -3, 0, -1},
+   {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+   {-1, 0, -3, -1, 1, -3, -2, -1, -3, 0, 5, -2, // K
+	-1, 0, 0, -1, 1, 2, 0, -1, 0, -2, -3, 0, -2},
+   {-1, 0, -1, -4, -3, 0, -4, -3, 2, 0, -2, 4, // L
+	2, -3, 0, -3, -2, -2, -2, -1, 0, 1, -2, 0, -1},
+   {-1, 0, -1, -3, -2, 0, -3, -2, 1, 0, -1, 2, // M
+	5, -2, 0, -2, 0, -1, -1, -1, 0, 1, -1, 0, -1},
+   {-2, 0, -3, 1, 0, -3, 0, 1, -3, 0, 0, -3, // N
+	-2, 6, 0, -2, 0, 0, 1, 0, 0, -3, -4, 0, -2},
+   {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+   {-1, 0, -3, -1, -1, -4, -2, -2, -3, 0, -1, -3, // P
+	-2, -2, 0, 7, -1, -2, -1, -1, 0, -2, -4, 0, -3},
+   {-1, 0, -3, 0, 2, -3, -2, 0, -3, 0, 1, -2, // Q
+	0, 0, 0, -1, 5, 1, 0, -1, 0, -2, -2, 0, -1},
+   {-1, 0, -3, -2, 0, -3, -2, 0, -3, 0, 2, -2, // R
+	-1, 0, 0, -2, 1, 5, -1, -1, 0, -3, -3, 0, -2},
+   {1, 0, -1, 0, 0, -2, 0, -1, -2, 0, 0, -2, // S
+	-1, 1, 0, -1, 0, -1, 4, 1, 0, -2, -3, 0, -2},
+   {0, 0, -1, -1, -1, -2, -2, -2, -1, 0, -1, -1, // T
+	-1, 0, 0, -1, -1, -1, 1, 5, 0, 0, -2, 0, -2},
+   {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+   {0, 0, -1, -3, -2, -1, -3, -3, 3, 0, -2, 1, // V
+	1, -3, 0, -2, -2, -3, -2, 0, 0, 4, -3, 0, -1},
+   {-3, 0, -2, -4, -3, 1, -2, -2, -3, 0, -3, -2, // W
+	-1, -4, 0, -4, -2, -3, -3, -2, 0, -3, 11, 0, 2},
+   {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+   {-2, 0, -2, -3, -2, 3, -3, 2, -1, 0, -2, -1, // Y
+	-1, -2, 0, -3, -1, -2, -2, -2, 0, -1, 2, 0, 7}
+};
+
+
+
+
+double penalty = 4; //introducing auto penalty
+double gap_opening_penalty = 10;
+double gap_extension_penalty = 0.5;
+double gap_new_penalty = gap_opening_penalty + gap_extension_penalty;
+double match_score = 1;
 
 //introducing some useful function which set us value for diagonal movement
-double ifequal(char a, char b) 
+double ifequal(char a, char b)
 {
 	double result;
 	a == b ? result = match_score : result = penalty;
@@ -52,148 +106,108 @@ int max_index(double array[], int length)
 	return ind;
 };
 
+double max(double x, double y)
+{
+	return x > y ? x : y;
+};
 
-int main() 
+double max(double x, double y, double z)
+{
+	return x > y ? (z = (x > z ? x : z)) : (z = (y > z ? y : z));
+};
+
+
+int main()
+{
+	string seq1, seq2;
+	std::cout << "Input first sequence " << endl;
+	cin >> seq1;
+	std::cout << "Input second sequence " << endl;
+	cin >> seq2;
+
+	//set seq lengths
+	int seq1_len = seq1.length();
+	int seq2_len = seq2.length();
+
+	//set matrix
+	//my compiler has problems with dynamic array size so the code will be twisted
+
+	double **matrix = (double **)malloc((seq1_len + 1) * sizeof(double *));
+	for (int i = 0; i < (seq1_len + 1); i++)
+		matrix[i] = (double *)malloc((seq2_len + 1) * sizeof(double));
+
+	//set zero matrix
+	for (int i = 0; i < seq1_len; i++)
 	{
-		string seq1, seq2;
-		std::cout << "Input first sequence " << endl;
-		cin >> seq1;
-		std::cout << "Input second sequence " << endl;
-		cin >> seq2;
-
-
-		//set seq lengths
-		int seq1_len = seq1.length();
-		int seq2_len = seq2.length();
-	
-		//boost::algorithm::to_upper(seq1); // modifies seq1 to upper case, is avaliable if boost library is installed
-		//boost::algorithm::to_upper(seq2); // modifies seq2 to upper case, is avaliable if boost library is installed
-
-		//set matrix
-		//my compiler has problems with dynamic array size so the code will be twisted
-
-		double **matrix = (double **)malloc(seq1_len * sizeof(double *));
-		for (int i = 0; i < seq1_len; i++)
-			matrix[i] = (double *)malloc(seq2_len * sizeof(double));
-
-		//set zero matrix
-		for (int i = 0; i < seq1_len; i++)
+		for (int j = 0; j < seq2_len; j++)
 		{
-			for (int j = 0; j < seq2_len; j++)
-			{
-				matrix[i][j] = 0;
-			}
+			matrix[i][j] = 0;
 		}
+	}
 
-		//set traceback and some other cool things
-		double traceback[4];
+	//set traceback and some other cool things
+	double traceback[4];
 
-		double **I_i = (double **)malloc((seq1_len + 1) * sizeof(double *));
-		for (int i = 0; i < (seq1_len + 1); i++)
-			I_i[i] = (double *)malloc((seq2_len + 1) * sizeof(double));
+	double **I_i = (double **)malloc((seq1_len + 1) * sizeof(double *));
+	for (int i = 0; i < (seq1_len + 1); i++)
+		I_i[i] = (double *)malloc((seq2_len + 1) * sizeof(double));
 
-		double **I_j = (double **)malloc((seq1_len + 1) * sizeof(double *));
-		for (int i = 0; i < (seq1_len + 1); i++)
-			I_j[i] = (double *)malloc((seq2_len + 1) * sizeof(double));
+	double **I_j = (double **)malloc((seq1_len + 1) * sizeof(double *));
+	for (int i = 0; i < (seq1_len + 1); i++)
+		I_j[i] = (double *)malloc((seq2_len + 1) * sizeof(double));
 
-		//start populating matrix
-		for (int i = 1; i < seq1_len; i++)
-		{
-			for (int j = 1; j < seq2_len; j++)
-			{
-				traceback[0] = matrix[i - 1][j - 1] + ifequal(seq1[i - 1], seq2[j - 1]); //match or mismatch
-				traceback[1] = matrix[i - 1][j] + penalty; //deletion
-				traceback[2] = matrix[i][j - 1] + penalty; //insertion
-				traceback[3] = 0;
-				int ind; //index of max element
-				matrix[i][j] = *max_element(traceback, traceback + 4);
-				ind = max_index(traceback, 4);
-				switch (ind)
-				{
-				case 0:
-					I_i[i][j] = i - 1;
-					I_j[i][j] = j - 1;
-					break;
-				case 1:
-					I_i[i][j] = i - 1;
-					I_j[i][j] = j;
-					break;
-				case 2:
-					I_i[i][j] = i;
-					I_j[i][j] = j - 1;
-					break;
-				case 3:
-					I_i[i][j] = i;
-					I_j[i][j] = j;
-					break;
-				}
-			}
+	//start populating matrix
+
+	double big_big_double = -65536;
+	   	 
+	//affine gap costs 
+	for (int i = 1; i < (seq1_len + 1); i++) {
+		I_i[i][0] = big_big_double;
+		matrix[i][0] = I_j[i][0] = -gap_opening_penalty - i * gap_extension_penalty;
+	}
+
+	for (int j = 1; j < (seq2_len + 1); j++) {
+		I_j[0][j] = big_big_double;
+		matrix[0][j] = I_i[0][j] = -gap_opening_penalty - j * gap_extension_penalty;
+	}
+
+
+	//calculating matrix with affine gap penalty
+	for (int i = 1; i < (seq1_len + 1); i++) {
+		for (int j = 1; j < (seq2_len + 1); j++) {
+			I_i[i][j] =
+				max(I_i[i][j - 1] - gap_extension_penalty, matrix[i][j - 1] - gap_new_penalty);
+			I_j[i][j] =
+				max(I_j[i - 1][j] - gap_extension_penalty, matrix[i - 1][j] - gap_new_penalty);
+			matrix[i][j] =
+				max(
+					matrix[i - 1][j - 1] + BLOSUM[seq1[i - 1] - 'A'][seq2[j - 1] - 'A']
+					/* + here should be BLOSUM coefficient*/,
+					I_i[i][j], I_j[i][j]
+				);
 		}
+	}
 
-		// find the max score in the matrix
-		double matrix_max = 0;
-		int i_max = 0, j_max = 0;
-		for (int i = 1; i < seq1_len;i++)
-		{
-			for (int j = 1; j < seq2_len;j++)
-			{
-				if (matrix[i][j] > matrix_max)
-				{
-					matrix_max = matrix[i][j];
-					i_max = i;
-					j_max = j;
-				}
-			}
+	//backtracking
+
+	int i = seq1_len, j = seq2_len - 1;
+
+	while (i > 0 || j > 0) {
+		if (matrix[i][j] == I_i[i][j]) {
+			seq1.insert(i, 1, '-');
+			j--;
 		}
-
-		std::cout << "Max score in the matrix is " << matrix_max << endl;
-
-		for (int i = 0; i < seq1_len; i++) 
-		{
-			for (int j = 0; j < seq2_len; j++) {
-				std::cout << matrix[i][j];
-			}
-			std::cout << endl;
+		else if (matrix[i][j] == I_j[i][j]) {
+			seq2.insert(j, 1, '-');
+			i--;
 		}
-
-		// traceback
-
-		int current_i = i_max, current_j = j_max;
-		int next_i = I_i[current_i][current_j];
-		int next_j = I_j[current_i][current_j];
-		int tick = 0;
-
-		char *consensus_1 = NULL;
-		consensus_1 = (char *)malloc((seq1_len + seq2_len + 2) * sizeof(char));
-
-		char *consensus_2 = NULL;
-		consensus_2 = (char *)malloc((seq1_len + seq2_len + 2) * sizeof(char));
-
-
-		while (((current_i != next_i) || (current_j != next_j)) && (next_j != 0) && (next_i != 0))
-		{
-
-			next_i == current_i ? consensus_1[tick] = '-' : consensus_1[tick] = seq1[current_i - 1];
-			//deletion VS match/mismatch
-			
-			next_j == current_j ? consensus_2[tick] = '-' : consensus_2[tick] = seq2[current_j - 1]; 
-		
-			current_i = next_i;
-			current_j = next_j;
-			next_i = I_i[current_i][current_j];
-			next_j = I_j[current_i][current_j];
-			tick++;
+		else {
+			i--, j--;
 		}
+	}
 
-		//print the consensus sequences
-		std::cout << endl << endl;
-		std::cout << "Alignment:" << endl << endl;
-		for (int i = 0;i < seq1_len;i++) { std::cout << seq1[i]; }; std::cout << "  and" << endl;
-		for (int i = 0;i < seq2_len;i++) { std::cout << seq2[i]; }; std::cout << endl << endl;
-		for (int i = tick - 1;i >= 0;i--) std::cout << consensus_1[i];
-		std::cout << endl;
-		for (int j = tick - 1;j >= 0;j--) std::cout << consensus_2[j];
-		std::cout << endl;
+	//print result
+	cout << "Score: " << matrix[seq1_len][seq2_len] << endl << endl << seq1 << endl << seq2 << endl;
 
-		return 0;
+	return 0;
 }
