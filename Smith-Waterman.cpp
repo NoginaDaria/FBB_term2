@@ -96,9 +96,9 @@ int main()
 		{
 			for (int j = 1; j < seq2_len; j++)
 			{
-				traceback[0] = matrix[i - 1][j - 1] + ifequal(seq1[i - 1], seq2[j - 1]);
-				traceback[1] = matrix[i - 1][j] + penalty;
-				traceback[2] = matrix[i][j - 1] + penalty;
+				traceback[0] = matrix[i - 1][j - 1] + ifequal(seq1[i - 1], seq2[j - 1]); //match or mismatch
+				traceback[1] = matrix[i - 1][j] + penalty; //deletion
+				traceback[2] = matrix[i][j - 1] + penalty; //insertion
 				traceback[3] = 0;
 				int ind; //index of max element
 				matrix[i][j] = *max_element(traceback, traceback + 4);
