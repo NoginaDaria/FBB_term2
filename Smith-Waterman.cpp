@@ -4,6 +4,7 @@ Smith-Waterman algorythm implementation
 was inspired by https://github.com/ngopal/SimpleSmithWatermanCPP/blob/master/SmithWaterman.cpp
 this one didn't work and I had to rewrite it, because it had problems (big problems) with indexes and memory allocation
 perspectives: divide gap penalty to gap opening penalty and gap extension penalty (upd 4th may: done)
++ update: user can set parameters
 
 input: program will ask you for two sequences
 output: matrix, max value of the matrix and alignments
@@ -102,6 +103,26 @@ int main()
 	cin >> seq1;
 	std::cout << "Input second sequence " << endl;
 	cin >> seq2;
+	
+	//allowing user to set parameters
+	cout << "Do you want to use auto parameters? [y,n]" << endl;
+	string answer;
+	cin >> answer;
+	if (answer == "n") {
+		cout << "Gap opening penalty[10.0]: ";
+		cin >> gap_opening_penalty;
+		cout << endl << "Gap extension penalty[0.5]: ";
+		cin >> gap_extension_penalty;
+		cout << endl << "Match score[1.0]: ";
+		cin >> match_score;
+		cout << endl;
+	}
+	else if (answer == "y") {
+		cout << "Continued with auto parameters" << endl;
+	}
+	else {
+		cout << "Sorry, I didn't understand, continued with auto parameters" << endl;
+	}
 
 	//set seq lengths
 	int seq1_len = seq1.length();
