@@ -16,6 +16,7 @@ hope it works nicely
 #include <iostream>
 #include <string>
 #include <algorithm>
+//#include <boost/algorithm/string.hpp>  needs to be installed to convert string to upper case in future, all these actions are commented to work on all devices
 
 using namespace std;
 
@@ -64,6 +65,9 @@ int main()
 		//set seq lengths
 		int seq1_len = seq1.length();
 		int seq2_len = seq2.length();
+	
+		//boost::algorithm::to_upper(seq1); // modifies seq1 to upper case, is avaliable if boost library is installed
+		//boost::algorithm::to_upper(seq2); // modifies seq2 to upper case, is avaliable if boost library is installed
 
 		//set matrix
 		//my compiler has problems with dynamic array size so the code will be twisted
