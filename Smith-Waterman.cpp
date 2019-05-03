@@ -24,12 +24,13 @@ double ifequal(char a, char b);
 int max_index(double array[], int length = 4);
 
 double penalty = -4; //introducing auto penalty
+double match_score = 1; //match_score
 
 //introducing some useful function which set us value for diagonal movement
 double ifequal(char a, char b) 
 {
 	double result;
-	a == b ? result = 1 : result = penalty;
+	a == b ? result = match_score : result = penalty;
 	return result;
 };
 
