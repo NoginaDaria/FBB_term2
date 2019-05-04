@@ -53,8 +53,7 @@ const signed char BLOSUM[][25] = { // the blosum 62 scoring matrix, taken from h
 
 
 
-
-double penalty = 4; //introducing auto penalty
+//auto penalty
 double gap_opening_penalty = 10;
 double gap_extension_penalty = 0.5;
 double gap_new_penalty = gap_opening_penalty + gap_extension_penalty;
@@ -109,10 +108,7 @@ int main()
 	double **matrix = (double **)malloc((seq1_len + 1) * sizeof(double *));
 	for (int i = 0; i < (seq1_len + 1); i++)
 		matrix[i] = (double *)malloc((seq2_len + 1) * sizeof(double));
-
-	//set traceback and some other cool things
-	double traceback[4];
-
+	
 	double **I_i = (double **)malloc((seq1_len + 1) * sizeof(double *));
 	for (int i = 0; i < (seq1_len + 1); i++)
 		I_i[i] = (double *)malloc((seq2_len + 1) * sizeof(double));
@@ -121,11 +117,10 @@ int main()
 	for (int i = 0; i < (seq1_len + 1); i++)
 		I_j[i] = (double *)malloc((seq2_len + 1) * sizeof(double));
 
-	//start populating matrix
-
+	//just big number to be the biggest
 	double big_big_double = -65536;
 	   	 
-	//affine gap costs 
+	//setting matrixes 
 	for (int i = 1; i < (seq1_len + 1); i++) {
 		I_i[i][0] = big_big_double;
 		matrix[i][0] = I_j[i][0] = -gap_opening_penalty - i * gap_extension_penalty;
