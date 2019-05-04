@@ -19,10 +19,6 @@ hope it works nicely
 
 using namespace std;
 
-//I'm too lazy to make .h file
-double ifequal(char a, char b);
-int max_index(double array[], int length = 4);
-
 const signed char BLOSUM[][25] = { // the blosum 62 scoring matrix, taken from https://sosal.kr/625
  { 4,-1,-2,-2, 0,-1,-1, 0,-2,-1,-1,-1,-1,-2,-1, 1, 0,-3,-2, 0,-2,-1,-1,-1,-4},
  {-1, 5, 0,-2,-3, 1, 0,-2, 0,-3,-2, 2,-1,-3,-2,-1,-1,-3,-2,-3,-1,-2, 0,-1,-4},
