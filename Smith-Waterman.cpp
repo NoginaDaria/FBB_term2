@@ -96,15 +96,18 @@ int main()
 
 	//set matrix
 	//my compiler has problems with dynamic array size so the code will be twisted
-
+	
+	//the main matrix
 	double **matrix = (double **)malloc((seq1_len + 1) * sizeof(double *));
 	for (int i = 0; i < (seq1_len + 1); i++)
 		matrix[i] = (double *)malloc((seq2_len + 1) * sizeof(double));
 	
+	//the 0-column will be filled with big non-positive number 
 	double **I_i = (double **)malloc((seq1_len + 1) * sizeof(double *));
 	for (int i = 0; i < (seq1_len + 1); i++)
 		I_i[i] = (double *)malloc((seq2_len + 1) * sizeof(double));
 
+	//the 0-row will be filled with big non-positive number
 	double **I_j = (double **)malloc((seq1_len + 1) * sizeof(double *));
 	for (int i = 0; i < (seq1_len + 1); i++)
 		I_j[i] = (double *)malloc((seq2_len + 1) * sizeof(double));
@@ -146,7 +149,7 @@ int main()
 
 	while (i > 0 || j > 0) {
 		if (matrix[i][j] == I_i[i][j]) {
-			seq1.insert(i, 1, '-');
+			seq1.insert(i, 1, '-'); //insert(position, number of symbols, symbol)
 			j--;
 		}
 		else if (matrix[i][j] == I_j[i][j]) {
