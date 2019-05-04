@@ -7,7 +7,7 @@ perspectives: divide gap penalty to gap opening penalty and gap extension penalt
 + update: user can set parameters
 
 SOS: alignments are calculated not bad, but the matrix coefficients are all non-positive, which argues with the idea of this algorythm. 
-Have no idea how to fix it and not break anything. Other word have, but it creates some "anti-alignments"
+Have no idea how to fix it and not to break anything. Other word I have, but it creates some "anti-alignments"
 
 input: program will ask you for two sequences and for parameters if you agree
 output: score and alignments
