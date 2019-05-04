@@ -142,7 +142,7 @@ int main()
 
 	//backtracking
 
-	int i = seq1_len, j = seq2_len - 1;
+	int i = seq1_len, j = seq2_len;
 
 	while (i > 0 || j > 0) {
 		if (matrix[i][j] == I_i[i][j]) {
