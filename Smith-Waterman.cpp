@@ -52,7 +52,6 @@ const signed char BLOSUM[][25] = { // the blosum 62 scoring matrix, taken from h
 double gap_opening_penalty = 10;
 double gap_extension_penalty = 0.5;
 double gap_new_penalty = gap_opening_penalty + gap_extension_penalty;
-double match_score = 1;
 
 double max(double x, double y)
 {
@@ -82,8 +81,6 @@ int main()
 		cin >> gap_opening_penalty;
 		cout << endl << "Gap extension penalty[0.5]: ";
 		cin >> gap_extension_penalty;
-		cout << endl << "Match score[1.0]: ";
-		cin >> match_score;
 		cout << endl;
 	}
 	else if (answer == "y") {
@@ -113,7 +110,7 @@ int main()
 		I_j[i] = (double *)malloc((seq2_len + 1) * sizeof(double));
 
 	//just big number to be the biggest
-	double big_big_double = -65536;
+	double big_big_double = -60000;
 	   	 
 	//setting matrixes 
 	for (int i = 1; i < (seq1_len + 1); i++) {
