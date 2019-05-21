@@ -12,7 +12,7 @@ output: score and alignments
 hope it works nicely
 */
 
-
+#include <stdlib.h>
 #include <iostream>
 #include <string>
 
